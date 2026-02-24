@@ -1,0 +1,17 @@
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+*.log
+.settings/
+.vscode/
+
+# appsettings.Development.json 
+
+.DS_Store
