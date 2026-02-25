@@ -57,7 +57,7 @@ namespace ourdekor.Data
                     .HasForeignKey(e => e.MaterialId);
 
                 entity.HasOne(e => e.Products)
-                    .WithMany()
+                    .WithMany(p => p.ProductMaterials) // янов указал какую коллекцию использовать
                     .HasForeignKey(e => e.ProductId);
             });
         }

@@ -18,17 +18,59 @@ namespace ourdekor.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Products>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<object>>> GetProducts(string search = "", int? typeId = null, string sort = "")
         {
-            return await _context.Products.Include(p => p.ProductType).ToListAsync();
+            // запрос с загрузкой всех связей
+            var query = _context.Products
+                .Include(p => p.ProductType)
+                .Include(p => p.ProductMaterials)
+                    .ThenInclude(pm => pm.Materials)
+                .AsQueryable();
+
+            // поиск по названи.
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.name.ToLower().Contains(search.ToLower()));
+            }
+
+            // фильтрация
+            if (typeId.HasValue)
+            {
+                query = query.Where(p => p.ProductTypeId == typeId);
+            }
+
+            // сортировка
+            query = sort switch
+            {
+                "price_asc" => query.OrderBy(p => p.min_price),
+                "price_desc" => query.OrderByDescending(p => p.min_price),
+                "name_asc" => query.OrderBy(p => p.name),
+                _ => query.OrderBy(p => p.id) // по умолчанию
+            };
+
+            var products = await query.ToListAsync();
+
+            // ормируем результат с расчетом стоимости
+            var result = products.Select(p => new {
+                p.id,
+                p.name,
+                p.article,
+                p.min_price,
+                p.width,
+                typeName = p.ProductType?.name,
+                // расчет стоимости производства (сумма материалов)
+                productionCost = p.ProductMaterials.Sum(pm =>
+                    (double)pm.count * (double)(pm.Materials?.price ?? 0))
+            });
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Products>> GetProduct(int id)
         {
-            // Вместо FindAsync используем FirstOrDefaultAsync с Include
             var product = await _context.Products
-                .Include(p => p.ProductType) // Вот эта магия подтянет данные типа
+                .Include(p => p.ProductType) 
                 .FirstOrDefaultAsync(p => p.id == id);
 
             if (product == null)
@@ -76,6 +118,28 @@ namespace ourdekor.Controllers
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet("calculate-material")]
+        public async Task<ActionResult<int>> GetCalculation(int productTypeId, int materialTypeId, int quantity, double param1, double param2)
+        {
+            var pType = await _context.ProductTypes.FindAsync(productTypeId);
+            var mType = await _context.MaterialTypes.FindAsync(materialTypeId);
+
+            if (pType == null || mType == null || quantity <= 0 || param1 <= 0 || param2 <= 0)
+            {
+                return Ok(-1);
+            }
+
+            double countPerOne = param1 * param2 * (double)pType.coefficient;
+
+            // количество должно быть увеличено с учетом брака
+            double countWithScrap = countPerOne * (1 + (double)mType.defect_percent / 100);
+
+            double total = countWithScrap * quantity;
+
+            // возвращаем целое число, округленное вверх
+            return Ok((int)Math.Ceiling(total));
         }
     }
 }

@@ -10,5 +10,6 @@
         public decimal width { get; set; }
         
         public virtual ProductType ProductType { get; set; }
+        public virtual ICollection<ProductMaterials> ProductMaterials { get; set; }
     }
 }
