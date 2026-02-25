@@ -7,16 +7,23 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddControllers()
+// регистрация MVC и JSON настроек в одной цепочке
+builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
-        // предотвращает бесконечные циклы при загрузке связанных данных 
-        // например, Продукт -> ТипПродукта -> СписокПродуктов...
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
 var app = builder.Build();
 
+app.UseStaticFiles();
+
+app.UseRouting();
+
 app.MapControllers();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Products}/{action=IndexView}/{id?}");
 
 app.Run();

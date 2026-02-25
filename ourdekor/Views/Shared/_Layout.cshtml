@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Наш декор</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" type="image/png" href="~/images/icon.png" />
+</head>
+<body>
+    <header style="padding: 10px; display: flex; align-items: center;">
+        <link rel="icon" type="image/x-icon" href="~/images/favicon.ico" />
+        <img src="~/images/logo.png" alt="Логотип" style="height: 50px; margin-right: 20px;" />
+        <h1 style="margin: 0;">Наш декор</h1>
+    </header>
+
+    <main class="container" style="padding: 20px;">
+        @RenderBody()
+    </main>
+
+    <footer style="text-align: center; padding: 10px; border-top: 1px solid #BBD9B2;">
+        &copy; 2026 - «Наш декор»
+    </footer>
+</body>
+</html>

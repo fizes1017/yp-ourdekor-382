@@ -8,7 +8,7 @@ namespace ourdekor.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
@@ -27,7 +27,7 @@ namespace ourdekor.Controllers
                     .ThenInclude(pm => pm.Materials)
                 .AsQueryable();
 
-            // поиск по названи.
+            // поиск по названии
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.name.ToLower().Contains(search.ToLower()));
@@ -50,7 +50,7 @@ namespace ourdekor.Controllers
 
             var products = await query.ToListAsync();
 
-            // ормируем результат с расчетом стоимости
+            // формируем результат с расчетом стоимости
             var result = products.Select(p => new {
                 p.id,
                 p.name,
@@ -140,6 +140,42 @@ namespace ourdekor.Controllers
 
             // возвращаем целое число, округленное вверх
             return Ok((int)Math.Ceiling(total));
+        }
+
+        [HttpGet("/products-list")]
+        [HttpGet("/")]
+        public async Task<IActionResult> IndexView(string search = "", int? typeId = null, string sort = "")
+        {
+            var query = _context.Products
+                .Include(p => p.ProductType)
+                .Include(p => p.ProductMaterials).ThenInclude(pm => pm.Materials)
+                .AsQueryable();
+
+            // поиск по названии
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.name.ToLower().Contains(search.ToLower()));
+            }
+
+            // фильтрация
+            if (typeId.HasValue)
+            {
+                query = query.Where(p => p.ProductTypeId == typeId);
+            }
+
+            // сортировка
+            query = sort switch
+            {
+                "price_asc" => query.OrderBy(p => p.min_price),
+                "price_desc" => query.OrderByDescending(p => p.min_price),
+                "name_asc" => query.OrderBy(p => p.name),
+                _ => query.OrderBy(p => p.id) // по умолчанию
+            };
+
+            var products = await query.ToListAsync();
+
+            // передаем список в HTML - представление
+            return View("Index", products);
         }
     }
 }

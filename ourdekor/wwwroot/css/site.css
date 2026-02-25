@@ -1,0 +1,51 @@
+﻿@font-face {
+    font-family: 'Gabriola';
+    src: local('Gabriola');
+}
+
+body {
+    font-family: 'Gabriola', serif;
+    background-color: #FFFFFF; /* основной фон */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* доп фон */
+header, .secondary-bg {
+    background-color: #BBD9B2;
+}
+
+/* кнопки, ссылки */
+.btn-accent, .accent-color {
+    background-color: #2D6033;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    .btn-accent:hover {
+        background-color: #1e4222;
+    }
+
+/* для карточки товара */
+.product-card {
+    border: 1px solid #BBD9B2;
+    margin: 10px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-cost {
+    font-weight: bold;
+    font-size: 1.2em;
+    align-self: center;
+}

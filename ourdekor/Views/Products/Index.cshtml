@@ -1,0 +1,44 @@
+﻿@model IEnumerable<ourdekor.Models.Products>
+
+@{
+    ViewData["Title"] = "Список продукции";
+}
+
+<div class="controls" style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <input type="text" placeholder="Введите для поиска" style="padding: 5px; width: 300px;" />
+    <select style="padding: 5px;">
+        <option>Сортировка</option>
+        <option>Стоимость по возрастанию</option>
+    </select>
+    <select style="padding: 5px;">
+        <option>Фильтрация</option>
+    </select>
+</div>
+
+<div class="product-list">
+    @foreach (var item in Model)
+    {
+        <div class="product-card">
+            <div class="product-info">
+                <span style="font-size: 1.5em; font-weight: bold;">
+                    @item.ProductType?.name | @item.name
+                </span>
+                <span>Артикул: @item.article</span>
+                <span>Минимальная стоимость для партнера: @item.min_price р.</span>
+                <span>Ширина (м): @item.width</span>
+            </div>
+
+            <div class="product-cost">
+                @* cчитаем стоимость *@
+                @{
+                    decimal cost = item.ProductMaterials?.Sum(pm => pm.count * (pm.Materials?.price ?? 0)) ?? 0;
+                }
+                Стоимость: @cost.ToString("N2") р.
+            </div>
+        </div>
+    }
+</div>
+
+<div style="margin-top: 20px;">
+    <button class="btn-accent">Добавить продукцию</button>
+</div>
