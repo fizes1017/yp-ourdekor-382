@@ -4,16 +4,32 @@
     ViewData["Title"] = "Список продукции";
 }
 
-<div class="controls" style="margin-bottom: 20px; display: flex; gap: 10px;">
-    <input type="text" placeholder="Введите для поиска" style="padding: 5px; width: 300px;" />
-    <select style="padding: 5px;">
-        <option>Сортировка</option>
-        <option>Стоимость по возрастанию</option>
+@* Добавил id="filterForm", чтобы скрипт внизу мог найти эту форму *@
+<form method="get" id="filterForm" action="/products-list" class="controls" style="margin-bottom: 20px; display: flex; gap: 10px;">
+
+    <input type="text" name="search" value="@Context.Request.Query["search"]"
+           placeholder="Введите для поиска" style="padding: 5px; width: 300px;" />
+
+    @* сортировка с автоматическим обновлением списка *@
+    <select name="sort" onchange="this.form.submit()" style="padding: 5px;">
+        <option value="">Сортировка</option>
+        <option value="price_asc">Стоимость по возрастанию</option>
+        <option value="price_desc">Стоимость по убыванию</option>
+        <option value="name_asc">Наименование (А-Я)</option>
     </select>
-    <select style="padding: 5px;">
-        <option>Фильтрация</option>
+
+    @* фильтрация по типам *@
+    <select name="typeId" onchange="this.form.submit()" style="padding: 5px;">
+        <option value="">Фильтрация (Все типы)</option>
+        <option value="1">Декоративные обои</option>
+        <option value="2">Фотообои</option>
+        <option value="3">Обои под покраску</option>
+        <option value="4">Стеклообои</option>
     </select>
-</div>
+
+    <button type="submit" class="btn-accent" style="padding: 5px 15px;">Найти</button>
+    <a href="/products-list" style="text-decoration:none; color: #2D6033; align-self:center; font-size: 0.9em;">Сбросить</a>
+</form>
 
 <div class="product-list">
     @foreach (var item in Model)
@@ -26,19 +42,42 @@
                 <span>Артикул: @item.article</span>
                 <span>Минимальная стоимость для партнера: @item.min_price р.</span>
                 <span>Ширина (м): @item.width</span>
+
+                @* редактирование и Состав материалов *@
+                <div style="margin-top: 15px; display: flex; gap: 15px;">
+                    <a href="/product/edit/@item.id" class="btn-accent" style="text-decoration:none; padding: 5px 15px; font-size: 0.9em;">Редактировать</a>
+                    <a href="/product/materials/@item.id" style="color: #2D6033; align-self:center; text-decoration: underline;">Посмотреть состав</a>
+                </div>
             </div>
 
             <div class="product-cost">
-                @* cчитаем стоимость *@
                 @{
-                    decimal cost = item.ProductMaterials?.Sum(pm => pm.count * (pm.Materials?.price ?? 0)) ?? 0;
+                    var materials = item.ProductMaterials;
+                    if (materials != null && materials.Any())
+                    {
+                        decimal cost = materials.Sum(pm => pm.count * (pm.Materials?.price ?? 0));
+                        @:Стоимость: @cost.ToString("N2") р.
+                    }
+                    else
+                    {
+                        @:Стоимость: Не определена
+                    }
                 }
-                Стоимость: @cost.ToString("N2") р.
             </div>
         </div>
     }
 </div>
 
 <div style="margin-top: 20px;">
-    <button class="btn-accent">Добавить продукцию</button>
+    <a href="/product/edit" class="btn-accent" style="text-decoration:none; display: inline-block;">Добавить продукцию</a>
 </div>
+
+<script>
+    // находим все выпадающие списки внутри нашей формы
+    document.querySelectorAll('#filterForm select').forEach(select => {
+        select.addEventListener('change', () => {
+            // автоматически отправляем форму на сервер
+            document.getElementById('filterForm').submit();
+        });
+    });
+</script>
