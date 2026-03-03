@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - ООО "ТВК"</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="company-title" onclick="window.location.href='index.html'">ООО "ТВК"</h1>
+        </header>
+
+        <nav class="navigation">
+            <button class="nav-button" onclick="window.location.href='price-list.html'">Справочник цен</button>
+            <button class="nav-button" onclick="window.location.href='calculator.html'">Калькулятор</button>
+            <button class="nav-button active" onclick="window.location.href='profile.html'">Профиль</button>
+            <button class="nav-button" onclick="AuthManager.logout()">Выход</button>
+        </nav>
+
+        <main class="main-content">
+            <h2>Профиль пользователя</h2>
+
+            <section class="form-section">
+                <h3>Личная информация</h3>
+                <form id="profileForm" onsubmit="handleProfileSave(event)">
+                    <div class="form-group">
+                        <label for="fullName">ФИО:</label>
+                        <input type="text" id="fullName" placeholder="Введите ФИО">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Телефон:</label>
+                        <input type="tel" id="phone" class="js-phone-mask" placeholder="+7 (999) 123-45-67" maxlength="18">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Роль:</label>
+                        <input type="text" id="role" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createdAt">Дата регистрации:</label>
+                        <input type="text" id="createdAt" disabled>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="form-section">
+                <h3>Смена пароля</h3>
+                <form id="passwordForm" onsubmit="handleChangePassword(event)">
+                    <div class="form-group">
+                        <label for="currentPassword">Текущий пароль:</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">Новый пароль:</label>
+                        <input type="password" id="newPassword" minlength="6" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Подтверждение пароля:</label>
+                        <input type="password" id="confirmPassword" minlength="6" required>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Изменить пароль</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="table-section">
+                <h3>Мои расчеты</h3>
+                <table id="calculationsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th>Дата</th>
+                            <th>Итоговая сумма, руб</th>
+                            <th>Кол-во позиций</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calculationsTableBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <p>Расчеты не найдены</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for КП form (client data) -->
+    <div id="kpModalOverlay" class="modal-overlay" onclick="if(event.target === this) closeKpModal()">
+        <div class="modal kp-modal" style="max-width: 450px;">
+            <div class="modal-title">Создать коммерческое предложение</div>
+            <form id="kpForm" onsubmit="submitKpForm(event)">
+                <div class="modal-form">
+                    <div class="form-group">
+                        <label>Компания контрагента *</label>
+                        <input type="text" id="kpCustomerCompany" required placeholder="ООО «Название»">
+                    </div>
+                    <div class="form-group">
+                        <label>Контактное лицо *</label>
+                        <input type="text" id="kpCustomerPerson" required placeholder="Иванов И.И.">
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон *</label>
+                        <input type="tel" id="kpCustomerPhone" class="js-phone-mask" required placeholder="+7 (999) 123-45-67" maxlength="18">
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="kpCustomerEmail" required placeholder="client@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Адрес (необязательно)</label>
+                        <input type="text" id="kpCustomerAddress" placeholder="г. Москва, ул. Примерная, д. 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Комментарии (необязательно)</label>
+                        <textarea id="kpComments" rows="2" placeholder="Дополнительная информация"></textarea>
+                    </div>
+                </div>
+                <div class="modal-buttons" style="margin-top: 15px;">
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeKpModal()">Отмена</button>
+                    <button type="submit" class="modal-btn modal-btn-primary">Сформировать PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for messages -->
+    <div id="modalOverlay" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+        <div class="modal" id="modal">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-message" id="modalMessage"></div>
+            <div class="modal-buttons" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <script src="js/phone-mask.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/kp-modal.js"></script>
+    <script src="js/profile.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!AuthManager.requireAuth()) {
+                return;
+            }
+        });
+    </script>
+</body>
+</html>
+

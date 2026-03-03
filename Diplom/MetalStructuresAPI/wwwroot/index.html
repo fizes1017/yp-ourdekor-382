@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ООО "ТВК"</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="company-title" onclick="window.location.href='index.html'">ООО "ТВК"</h1>
+        </header>
+
+        <nav class="navigation">
+            <button class="nav-button" onclick="navigateToPage('price-list.html')">Справочник цен</button>
+            <button class="nav-button" onclick="navigateToPage('calculator.html')">Калькулятор</button>
+            <div class="nav-auth">
+                <span id="userInfo" style="display: none;"></span>
+                <button class="nav-button" id="loginBtn" onclick="window.location.href='login.html'">Вход</button>
+                <button class="nav-button" id="profileBtn" style="display: none;" onclick="window.location.href='profile.html'">Профиль</button>
+                <button class="nav-button" id="logoutBtn" style="display: none;" onclick="AuthManager.logout()">Выход</button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <h2>О компании</h2>
+            <div class="info-section">
+                <p class="company-description">
+                    <strong>ООО «Трубчатые высотные конструкции» (ООО «ТВК»)</strong> — металлоторгующая компания и производитель металлоконструкций, работающий с предприятиями высокотехнологичных отраслей промышленности России. Компания специализируется на поставках трубного металлопроката от ведущих заводов-изготовителей и производстве широкого спектра металлоконструкций: от элементов зданий и сооружений до антенных опор, технологических эстакад и нестандартного оборудования.
+                </p>
+                <p class="company-description">
+                    Основное преимущество ООО «ТВК» — наличие собственного склада сортового проката и прямые договоры с металлургическими комбинатами, что позволяет оперативно выполнять заказы, гарантировать качество и соблюдение сроков. Компания также является эксклюзивным партнером Группы компаний «Корал» и осуществляет отгрузку продукции по всей России и в страны ближнего зарубежья.
+                </p>
+                <div class="features-section">
+                    <h3>Возможности системы:</h3>
+                    <ul>
+                        <li>Управление справочником цен на материалы</li>
+                        <li>Расчет итоговой стоимости заказа</li>
+                        <li>Формирование коммерческих предложений</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Update navigation based on auth status
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavigation();
+        });
+
+        function updateNavigation() {
+            const isAuth = AuthManager.checkAuth();
+            const user = AuthManager.getCurrentUser();
+            
+            if (isAuth && user) {
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('profileBtn').style.display = 'inline-block';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                document.getElementById('userInfo').style.display = 'inline-block';
+                document.getElementById('userInfo').textContent = user.fullName || user.email;
+            } else {
+                document.getElementById('loginBtn').style.display = 'inline-block';
+                document.getElementById('profileBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'none';
+            }
+        }
+
+        // Navigate to page with auth check
+        function navigateToPage(page) {
+            if (!AuthManager.checkAuth()) {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(page);
+            } else {
+                window.location.href = page;
+            }
+        }
+    </script>
+</body>
+</html>
+
+

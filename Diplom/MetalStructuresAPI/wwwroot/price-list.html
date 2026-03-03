@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Справочник цен - ООО "ТВК"</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="company-title" onclick="window.location.href='index.html'">ООО "ТВК"</h1>
+        </header>
+
+        <nav class="navigation">
+            <button class="nav-button active" onclick="window.location.href='price-list.html'">Справочник цен</button>
+            <button class="nav-button" onclick="window.location.href='calculator.html'">Калькулятор</button>
+            <button class="nav-button" onclick="window.location.href='profile.html'">Профиль</button>
+            <button class="nav-button" onclick="AuthManager.logout()">Выход</button>
+        </nav>
+
+        <main class="main-content">
+            <h2>Справочник цен</h2>
+            
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="article">Артикул:</label>
+                    <div class="combobox-wrapper">
+                        <input type="text" id="article" placeholder="Введите артикул или выберите из списка" autocomplete="off">
+                        <button type="button" class="combobox-toggle" onclick="toggleArticleDropdown()">▼</button>
+                        <div class="combobox-dropdown" id="articleDropdown"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="name">Название:</label>
+                    <input type="text" id="name" placeholder="Введите название">
+                </div>
+                
+                <div class="form-group">
+                    <label for="price">Цена, в руб:</label>
+                    <input type="number" id="price" step="0.01" placeholder="Введите цену">
+                </div>
+                
+                <div class="form-group">
+                    <label for="unit">Измерение:</label>
+                    <div class="combobox-wrapper">
+                        <input type="text" id="unit" placeholder="Введите единицу измерения или выберите из списка" autocomplete="off">
+                        <button type="button" class="combobox-toggle" onclick="toggleUnitDropdown()">▼</button>
+                        <div class="combobox-dropdown" id="unitDropdown"></div>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button class="btn btn-primary" onclick="saveMaterial()">Сохранить</button>
+                    <button class="btn btn-secondary" onclick="clearForm()">Очистить</button>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <table id="materialsTable">
+                    <thead>
+                        <tr>
+                            <th>Артикул</th>
+                            <th>Название</th>
+                            <th>Цена, в руб</th>
+                            <th>Измерение</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialsTableBody">
+                        <!-- Данные будут загружены через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for messages -->
+    <div id="modalOverlay" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+        <div class="modal" id="modal">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-message" id="modalMessage"></div>
+            <div class="modal-buttons" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/price-list.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!AuthManager.requireAuth()) {
+                return;
+            }
+        });
+    </script>
+</body>
+</html>
+
+
