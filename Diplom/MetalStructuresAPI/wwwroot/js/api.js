@@ -133,7 +133,7 @@ async function createCommercialProposalPdf(data) {
     const token = TokenManager.getToken();
     if (!token) throw new Error('Требуется авторизация');
 
-    const response = await fetch(`${API_BASE_URL}/commercial-proposals`, {
+    const response = await fetch(`${API_BASE_URL}/CommercialProposals`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
