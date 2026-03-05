@@ -43,6 +43,12 @@ header {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+.company-logo {
+    display: block;
+    margin: 0 auto 10px;
+    height: 60px;
+}
+
 .company-title {
     font-size: 36px;
     font-weight: 700;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
 
 // Исправление для timestamp PostgreSQL (избегаем проблем с timezone)
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -60,6 +61,11 @@ var app = builder.Build();
 
 app.UseCors();
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "images")),
+    RequestPath = "/images"
+});
 app.UseDefaultFiles();
 
 app.UseAuthentication();

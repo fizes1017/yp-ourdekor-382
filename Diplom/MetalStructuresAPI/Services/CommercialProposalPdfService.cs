@@ -1,5 +1,6 @@
 using System.IO;
 using MetalStructuresAPI.Models;
+using Microsoft.Extensions.Hosting;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 
@@ -8,6 +9,12 @@ namespace MetalStructuresAPI.Services;
 public class CommercialProposalPdfService
 {
     private static readonly string FontFamily = GetSafeFontFamily();
+    private readonly IHostEnvironment _environment;
+
+    public CommercialProposalPdfService(IHostEnvironment environment)
+    {
+        _environment = environment;
+    }
 
     private static string GetSafeFontFamily()
     {
@@ -41,6 +48,23 @@ public class CommercialProposalPdfService
         double y = 40;
         const double margin = 40;
         const double lineHeight = 14;
+
+        // Logo (if available)
+        try
+        {
+            var logoPath = Path.Combine(_environment.ContentRootPath, "images", "logo.png");
+            if (File.Exists(logoPath))
+            {
+                using var logo = XImage.FromFile(logoPath);
+                const double logoHeight = 40;
+                var logoWidth = logo.PixelWidth * logoHeight / logo.PixelHeight;
+                gfx.DrawImage(logo, page.Width - margin - logoWidth, y - 10, logoWidth, logoHeight);
+            }
+        }
+        catch
+        {
+            // Игнорируем ошибки логотипа, КП все равно формируется
+        }
 
         // Company header
         gfx.DrawString(company.Name, fontBold, XBrushes.Black, margin, y);
