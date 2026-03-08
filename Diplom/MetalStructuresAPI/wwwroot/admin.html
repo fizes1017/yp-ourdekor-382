@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Администрирование - ООО "ТВК"</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/images/logo.png" alt='Логотип ООО "ТВК"' class="company-logo">
+            <h1 class="company-title" onclick="window.location.href='index.html'">ООО "ТВК" — Администрирование</h1>
+        </header>
+
+        <nav class="navigation">
+            <button class="nav-button" onclick="window.location.href='price-list.html'">Справочник цен</button>
+            <button class="nav-button" onclick="window.location.href='calculator.html'">Калькулятор</button>
+            <button class="nav-button" onclick="window.location.href='profile.html'">Профиль</button>
+            <button class="nav-button active" onclick="window.location.href='admin.html'">Админ</button>
+            <button class="nav-button" onclick="AuthManager.logout()">Выход</button>
+        </nav>
+
+        <main class="main-content">
+            <h2>Панель администратора</h2>
+
+            <section class="form-section" id="adminManagersSection">
+                <h3>Менеджеры</h3>
+                <div class="form-group">
+                    <label>Список менеджеров</label>
+                    <table id="adminManagersTable">
+                        <thead>
+                            <tr>
+                                <th>ФИО</th>
+                                <th>Email</th>
+                                <th>Телефон</th>
+                                <th>Роль</th>
+                                <th>Дата регистрации</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="empty-state">Загрузка...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="form-section" id="adminMaterialsAuditSection">
+                <h3>Изменения в справочнике материалов</h3>
+                <div class="form-group">
+                    <label>Фильтр по менеджеру и дате</label>
+                    <div class="form-group">
+                        <select id="auditManagerSelect">
+                            <option value="">Все менеджеры</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <div>
+                                <label for="auditFrom">С даты</label>
+                                <input type="date" id="auditFrom">
+                            </div>
+                            <div>
+                                <label for="auditTo">По дату</label>
+                                <input type="date" id="auditTo">
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" id="loadAuditBtn">Показать изменения</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="materialsAuditTable">
+                        <thead>
+                            <tr>
+                                <th>Дата/время</th>
+                                <th>Менеджер</th>
+                                <th>Действие</th>
+                                <th>ID материала</th>
+                                <th>Детали</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-state">Нет данных</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="form-section" id="adminReportSection">
+                <h3>Отчёт по менеджерам</h3>
+                <div class="form-group">
+                    <label for="reportManagerSearch">Менеджеры</label>
+                    <input type="text" id="reportManagerSearch" placeholder="Поиск менеджеров по ФИО или email" style="margin-bottom: 10px;">
+                    <div id="reportManagersList" style="max-height: 220px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px;"></div>
+                    <small>Отметьте галочками нужных менеджеров.</small>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <div>
+                            <label for="reportFrom">Период с</label>
+                            <input type="date" id="reportFrom">
+                        </div>
+                        <div>
+                            <label for="reportTo">по</label>
+                            <input type="date" id="reportTo">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn btn-primary" id="generateReportBtn">Сформировать отчёт (PDF)</button>
+                </div>
+                <div id="reportHint" class="start-info" style="display:none; margin-top:15px;">
+                    Отчёт формируется в виде PDF файла, который будет загружен в браузере.
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+        <div class="modal" id="modal">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-message" id="modalMessage"></div>
+            <div class="modal-buttons" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <script src="js/phone-mask.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
+

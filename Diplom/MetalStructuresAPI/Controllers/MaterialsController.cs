@@ -105,6 +105,22 @@ public class MaterialsController : ControllerBase
         _context.Materials.Add(material);
         await _context.SaveChangesAsync();
 
+        // Audit log
+        var auditCreate = new AuditLog
+        {
+            EntityType = "Material",
+            EntityId = material.Id,
+            Action = "Create",
+            UserId = userId,
+            Timestamp = DateTime.UtcNow,
+            Details = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                New = new { material.Id, material.Article, material.Name, material.Price, material.Unit }
+            })
+        };
+        _context.AuditLogs.Add(auditCreate);
+        await _context.SaveChangesAsync();
+
         var materialDto = new MaterialDto
         {
             Id = material.Id,
@@ -139,6 +155,15 @@ public class MaterialsController : ControllerBase
         }
 
         var userId = GetCurrentUserId();
+
+        var oldValues = new
+        {
+            material.Article,
+            material.Name,
+            material.Price,
+            material.Unit
+        };
+
         material.Article = updateMaterialDto.Article;
         material.Name = updateMaterialDto.Name;
         material.Price = updateMaterialDto.Price;
@@ -158,6 +183,22 @@ public class MaterialsController : ControllerBase
             }
             throw;
         }
+
+        var auditUpdate = new AuditLog
+        {
+            EntityType = "Material",
+            EntityId = material.Id,
+            Action = "Update",
+            UserId = userId,
+            Timestamp = DateTime.UtcNow,
+            Details = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                Old = oldValues,
+                New = new { material.Article, material.Name, material.Price, material.Unit }
+            })
+        };
+        _context.AuditLogs.Add(auditUpdate);
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
@@ -182,6 +223,22 @@ public class MaterialsController : ControllerBase
         }
 
         _context.Materials.Remove(material);
+
+        var userId = GetCurrentUserId();
+        var auditDelete = new AuditLog
+        {
+            EntityType = "Material",
+            EntityId = material.Id,
+            Action = "Delete",
+            UserId = userId,
+            Timestamp = DateTime.UtcNow,
+            Details = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                Deleted = new { material.Id, material.Article, material.Name, material.Price, material.Unit }
+            })
+        };
+        _context.AuditLogs.Add(auditDelete);
+
         await _context.SaveChangesAsync();
 
         return NoContent();

@@ -54,6 +54,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function filterMaterials() {
+    const input = document.getElementById('materialsSearch');
+    if (!input) {
+        return;
+    }
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+        displayMaterials(allMaterials);
+        return;
+    }
+    const filtered = allMaterials.filter(m =>
+        (m.article && m.article.toLowerCase().includes(query)) ||
+        (m.name && m.name.toLowerCase().includes(query))
+    );
+    displayMaterials(filtered);
+}
+
+function resetMaterialsFilter() {
+    const input = document.getElementById('materialsSearch');
+    if (input) {
+        input.value = '';
+    }
+    displayMaterials(allMaterials);
+}
+
 // Load all materials from API
 async function loadMaterials() {
     try {
@@ -357,4 +382,12 @@ function closeModal() {
     overlay.classList.remove('show');
     window.confirmCallback = null;
 }
+
+// Экспортируем функции в глобальную область, чтобы обработчики в HTML работали корректно
+window.filterMaterials = filterMaterials;
+window.resetMaterialsFilter = resetMaterialsFilter;
+window.saveMaterial = saveMaterial;
+window.clearForm = clearForm;
+window.editMaterial = editMaterial;
+window.deleteMaterial = deleteMaterial;
 

@@ -18,12 +18,20 @@
             <button class="nav-button active" onclick="window.location.href='price-list.html'">Справочник цен</button>
             <button class="nav-button" onclick="window.location.href='calculator.html'">Калькулятор</button>
             <button class="nav-button" onclick="window.location.href='profile.html'">Профиль</button>
+            <button class="nav-button" id="adminBtn" style="display: none;" onclick="window.location.href='admin.html'">Админ</button>
             <button class="nav-button" onclick="AuthManager.logout()">Выход</button>
         </nav>
 
         <main class="main-content">
             <h2>Справочник цен</h2>
             
+            <div class="search-section">
+                <label for="materialsSearch">Поиск по справочнику</label>
+                <input type="text" id="materialsSearch" placeholder="Введите артикул или название" onkeyup="if(event.key==='Enter'){filterMaterials();}">
+                <button class="btn btn-primary" onclick="filterMaterials()">Найти</button>
+                <button class="btn btn-secondary" onclick="resetMaterialsFilter()">Сбросить</button>
+            </div>
+
             <div class="form-section">
                 <div class="form-group">
                     <label for="article">Артикул:</label>
@@ -95,6 +103,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (!AuthManager.requireAuth()) {
                 return;
+            }
+            const user = AuthManager.getCurrentUser && AuthManager.getCurrentUser();
+            const adminBtn = document.getElementById('adminBtn');
+            if (adminBtn) {
+                adminBtn.style.display = user && user.role === 'Admin' ? 'inline-block' : 'none';
             }
         });
     </script>

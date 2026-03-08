@@ -19,6 +19,7 @@
             <button class="nav-button" onclick="navigateToPage('calculator.html')">Калькулятор</button>
             <div class="nav-auth">
                 <span id="userInfo" style="display: none;"></span>
+                <button class="nav-button" id="adminBtn" style="display: none;" onclick="window.location.href='admin.html'">Админ</button>
                 <button class="nav-button" id="loginBtn" onclick="window.location.href='login.html'">Вход</button>
                 <button class="nav-button" id="profileBtn" style="display: none;" onclick="window.location.href='profile.html'">Профиль</button>
                 <button class="nav-button" id="logoutBtn" style="display: none;" onclick="AuthManager.logout()">Выход</button>
@@ -64,11 +65,19 @@
                 document.getElementById('logoutBtn').style.display = 'inline-block';
                 document.getElementById('userInfo').style.display = 'inline-block';
                 document.getElementById('userInfo').textContent = user.fullName || user.email;
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) {
+                    adminBtn.style.display = user.role === 'Admin' ? 'inline-block' : 'none';
+                }
             } else {
                 document.getElementById('loginBtn').style.display = 'inline-block';
                 document.getElementById('profileBtn').style.display = 'none';
                 document.getElementById('logoutBtn').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'none';
+                const adminBtn = document.getElementById('adminBtn');
+                if (adminBtn) {
+                    adminBtn.style.display = 'none';
+                }
             }
         }
 

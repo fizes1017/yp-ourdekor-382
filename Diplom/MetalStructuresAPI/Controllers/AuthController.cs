@@ -158,8 +158,8 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Неверный email или пароль" });
         }
 
-        // Generate JWT token
-        var token = _jwtService.GenerateToken(user.Id, user.Email);
+        // Generate JWT token with correct role
+        var token = _jwtService.GenerateToken(user.Id, user.Email, user.Role);
 
         var response = new AuthResponseDto
         {

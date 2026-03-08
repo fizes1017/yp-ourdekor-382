@@ -18,6 +18,7 @@
             <button class="nav-button" onclick="window.location.href='price-list.html'">Справочник цен</button>
             <button class="nav-button active" onclick="window.location.href='calculator.html'">Калькулятор</button>
             <button class="nav-button" onclick="window.location.href='profile.html'">Профиль</button>
+            <button class="nav-button" id="adminBtn" style="display: none;" onclick="window.location.href='admin.html'">Админ</button>
             <button class="nav-button" onclick="AuthManager.logout()">Выход</button>
         </nav>
 
@@ -121,6 +122,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (!AuthManager.requireAuth()) {
                 return;
+            }
+            const user = AuthManager.getCurrentUser && AuthManager.getCurrentUser();
+            const adminBtn = document.getElementById('adminBtn');
+            if (adminBtn) {
+                adminBtn.style.display = user && user.role === 'Admin' ? 'inline-block' : 'none';
             }
         });
     </script>
