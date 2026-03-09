@@ -179,11 +179,93 @@ public class AdminController : ControllerBase
             Action = a.Action,
             UserId = a.UserId,
             UserFullName = a.User?.FullName,
+            UserEmail = a.User?.Email,
             Timestamp = a.Timestamp,
-            Details = a.Details
+            Details = a.Details,
+            Summary = BuildMaterialChangeSummary(a.Details)
         }).ToList();
 
         return Ok(result);
+    }
+
+    private static string? BuildMaterialChangeSummary(string? detailsJson)
+    {
+        if (string.IsNullOrWhiteSpace(detailsJson))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(detailsJson);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("New", out var newEl) &&
+                !root.TryGetProperty("Old", out _) &&
+                !root.TryGetProperty("Deleted", out _))
+            {
+                var article = newEl.TryGetProperty("Article", out var a) ? a.GetString() : null;
+                var name = newEl.TryGetProperty("Name", out var n) ? n.GetString() : null;
+                var price = newEl.TryGetProperty("Price", out var p) ? p.GetDecimal() : (decimal?)null;
+                var unit = newEl.TryGetProperty("Unit", out var u) ? u.GetString() : null;
+
+                return $"Добавлен материал {name} (артикул {article}, цена {price}, ед. изм. {unit}) в справочник";
+            }
+
+            if (root.TryGetProperty("Old", out var oldEl) &&
+                root.TryGetProperty("New", out var newEl2))
+            {
+                var changes = new List<string>();
+
+                string? oldArticle = oldEl.TryGetProperty("Article", out var oa) ? oa.GetString() : null;
+                string? newArticle = newEl2.TryGetProperty("Article", out var na) ? na.GetString() : null;
+                if (oldArticle != newArticle)
+                {
+                    changes.Add($"артикул: {oldArticle} → {newArticle}");
+                }
+
+                string? oldName = oldEl.TryGetProperty("Name", out var on) ? on.GetString() : null;
+                string? newName = newEl2.TryGetProperty("Name", out var nn) ? nn.GetString() : null;
+                if (oldName != newName)
+                {
+                    changes.Add($"название: \"{oldName}\" → \"{newName}\"");
+                }
+
+                decimal? oldPrice = oldEl.TryGetProperty("Price", out var op) ? op.GetDecimal() : (decimal?)null;
+                decimal? newPrice = newEl2.TryGetProperty("Price", out var np) ? np.GetDecimal() : (decimal?)null;
+                if (oldPrice != newPrice)
+                {
+                    changes.Add($"цена: {oldPrice} → {newPrice}");
+                }
+
+                string? oldUnit = oldEl.TryGetProperty("Unit", out var ou) ? ou.GetString() : null;
+                string? newUnit = newEl2.TryGetProperty("Unit", out var nu) ? nu.GetString() : null;
+                if (oldUnit != newUnit)
+                {
+                    changes.Add($"ед. изм.: {oldUnit} → {newUnit}");
+                }
+
+                return changes.Count > 0
+                    ? $"Изменены поля: {string.Join(", ", changes)}"
+                    : "Изменений в основных полях не зафиксировано";
+            }
+
+            if (root.TryGetProperty("Deleted", out var deletedEl))
+            {
+                var article = deletedEl.TryGetProperty("Article", out var a) ? a.GetString() : null;
+                var name = deletedEl.TryGetProperty("Name", out var n) ? n.GetString() : null;
+                var price = deletedEl.TryGetProperty("Price", out var p) ? p.GetDecimal() : (decimal?)null;
+                var unit = deletedEl.TryGetProperty("Unit", out var u) ? u.GetString() : null;
+
+                return $"Удалён материал: артикул {article}, название \"{name}\", цена {price}, ед. изм. {unit}";
+            }
+
+            return detailsJson;
+        }
+        catch
+        {
+            return detailsJson;
+        }
     }
 
     // GET: api/admin/manager-activity

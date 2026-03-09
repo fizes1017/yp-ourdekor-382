@@ -98,7 +98,7 @@ public class MaterialsController : ControllerBase
             Name = createMaterialDto.Name,
             Price = createMaterialDto.Price,
             Unit = createMaterialDto.Unit,
-            CreatedAt = DateOnly.FromDateTime(DateTime.UtcNow),
+            CreatedAt = DateOnly.FromDateTime(DateTime.Now),
             CreatedBy = userId
         };
 
@@ -112,7 +112,7 @@ public class MaterialsController : ControllerBase
             EntityId = material.Id,
             Action = "Create",
             UserId = userId,
-            Timestamp = DateTime.UtcNow,
+            Timestamp = DateTime.Now,
             Details = System.Text.Json.JsonSerializer.Serialize(new
             {
                 New = new { material.Id, material.Article, material.Name, material.Price, material.Unit }
@@ -169,7 +169,7 @@ public class MaterialsController : ControllerBase
         material.Price = updateMaterialDto.Price;
         material.Unit = updateMaterialDto.Unit;
         material.UpdatedBy = userId;
-        // updated_at обновляется автоматически триггером в БД
+        material.UpdatedAt = DateTime.Now;
 
         try
         {
@@ -190,7 +190,7 @@ public class MaterialsController : ControllerBase
             EntityId = material.Id,
             Action = "Update",
             UserId = userId,
-            Timestamp = DateTime.UtcNow,
+            Timestamp = DateTime.Now,
             Details = System.Text.Json.JsonSerializer.Serialize(new
             {
                 Old = oldValues,
@@ -231,7 +231,7 @@ public class MaterialsController : ControllerBase
             EntityId = material.Id,
             Action = "Delete",
             UserId = userId,
-            Timestamp = DateTime.UtcNow,
+            Timestamp = DateTime.Now,
             Details = System.Text.Json.JsonSerializer.Serialize(new
             {
                 Deleted = new { material.Id, material.Article, material.Name, material.Price, material.Unit }

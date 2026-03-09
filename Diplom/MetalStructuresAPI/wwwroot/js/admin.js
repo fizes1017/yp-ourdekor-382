@@ -228,27 +228,42 @@ async function loadMaterialAudit() {
         const data = await apiRequest(`/admin/material-changes?${params.toString()}`, 'GET', null, true);
         tbody.innerHTML = '';
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Нет данных за выбранный период</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Нет данных за выбранный период</td></tr>';
             return;
         }
 
         data.forEach(row => {
             const tr = document.createElement('tr');
-            const detailsShort = row.details && row.details.length > 200
-                ? row.details.substring(0, 197) + '...'
-                : (row.details || '');
+            const actionText = mapActionToRussian(row.action);
+            const fullText = row.summary || row.details || '';
+            const shortText = fullText.length > 180 ? fullText.substring(0, 177) + '...' : fullText;
             tr.innerHTML = `
                 <td>${new Date(row.timestamp).toLocaleString()}</td>
                 <td>${row.userFullName || ''}</td>
-                <td>${row.action}</td>
+                <td>${row.userEmail || ''}</td>
+                <td>${actionText}</td>
                 <td>${row.entityId}</td>
-                <td title="${row.details || ''}">${detailsShort}</td>
+                <td title="${fullText || ''}">${shortText || ''}</td>
             `;
             tbody.appendChild(tr);
         });
     } catch (error) {
         console.error('Ошибка загрузки аудита материалов', error);
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Ошибка: ${error.message || ''}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Ошибка: ${error.message || ''}</td></tr>`;
+    }
+}
+
+function mapActionToRussian(action) {
+    if (!action) return '';
+    switch (action.toLowerCase()) {
+        case 'create':
+            return 'Создание';
+        case 'update':
+            return 'Изменение';
+        case 'delete':
+            return 'Удаление';
+        default:
+            return action;
     }
 }
 
